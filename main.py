@@ -1,5 +1,6 @@
 from random import randint
 from random import choice
+from time import time
 
 # A and B, R = dominants;
 # i and r = recessive
@@ -24,7 +25,7 @@ class Person:
         maxReproduceAge = 50
         reproducePause = 5
         oldGenReproduce = False
-        maxChild = 1
+        maxChild = 10
         def __init__(self, bloodType, rhType, gender,gen):
                 self.bloodType = bloodType
                 self.rhType = rhType
@@ -40,6 +41,7 @@ class Person:
                 self.childCount = 0
                 self.haveCouple = False
                 self.patner = None
+               # self.maxChild = randint(0,10)
         def grow(self):
                 if(self.age >= self.deathAge):
                         self.isAlive = False
@@ -97,22 +99,23 @@ def randomGenre():
 def randomPerson(gen,genre):
         return Person(randomBType(),randomRHType(),genre,gen)
 
-
+start_time = time()
+initialPop = 300
 initialGen = 0
 population = []
-for p in range(0,100):
+for p in range(0,initialPop):
         population.append(randomPerson(initialGen,MALE))
         population.append(randomPerson(initialGen,FEMALE))
-years = 100
+years = 2000
 curYear= 0
 while (curYear < years):
         curYear +=1
-        
+        print("Current y: {0}".format(curYear))
         nList = []
         for p  in range(0,len(population)):
                 population[p].grow()
         #       print(population[p].canReproduce)
-                if(population[p].canReproduce):
+                if(population[p].canReproduce and population[p].isAlive):
                         nList.append(population[p])
         pos = 0
         wait= 0
@@ -123,7 +126,6 @@ while (curYear < years):
         while(len(nList)> pos):
                 p1 = choice(nList)
                 p2 = choice(nList)
-                p1.gen != p2.gen
                 if(wait>10):
                         break
                 if(p1 == p2  or p1.gen != p2.gen):
@@ -149,15 +151,12 @@ for i in population:
 parsedR = {}
 parsedR["A"] = results["Ai"] + results["AA"]
 parsedR["B"] = results["Bi"] + results["BB"]
-parsedR["AB"] = results["AB"] + results["BA"]
+parsedR["AB"] = results["AB"]
 parsedR["O"] = results["ii"]
-print("Year:1000, Pop:{1} ".format(curYear,alive))
-        
 
+print(" Alive pop:{0}\n Total Pop:{1}\n Years:{2} ".format(alive,len(population),years))      
 print(parsedR)
-
-print(len(population))
-#print(population)
+print("Runtime: %ss " % (time() - start_time))
 
 
 

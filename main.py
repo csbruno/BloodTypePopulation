@@ -4,6 +4,10 @@ from time import time
 
 # A and B, R = dominants;
 # i and r = recessive
+bloodAlleles = [
+"A",
+"B"
+]
 bloodTypes = [
 "Ai", #Blood type A
 "AA", #Blood type A
@@ -11,6 +15,11 @@ bloodTypes = [
 "Bi", #Blood type B
 "AB", #Blood type AB
 "ii"  #Blood type O
+]
+ant = [
+"HH",
+"Hh",
+"hh"
 ]
 rhFactors = [
 "RR", #Positive +
@@ -39,9 +48,10 @@ class Person:
                 self.gen = gen
                 self.gen +=1
                 self.childCount = 0
+                self.eriFetal = False
                 self.haveCouple = False
                 self.patner = None
-               # self.maxChild = randint(0,10)
+             
         def grow(self):
                 if(self.age >= self.deathAge):
                         self.isAlive = False
@@ -69,8 +79,15 @@ class Person:
                         p.patner = self
                         self.yearsSinceLastChild = 0
                         self.childCount +=1
-                        return Person(doCombination(self.bloodType,p.bloodType),
+                        nChild = Person(doCombination(self.bloodType,p.bloodType),
                                 doCombination(self.rhType,p.rhType),randomGenre(),self.gen)
+
+                        if(self.rhType == "rr" and (not nChild.rhType == "rr")):
+                                self.eriFetal = True
+                                if(self.childCount>1):
+                                        nChild.isAlive = False
+                        return nChild
+        
 
 
 
@@ -82,12 +99,11 @@ def doCombination(type1,type2):
         types =[]
         for a in (type1):
                 for b in type2:
-                        if(a[0] == "i"): #Fix inverse outputs E.: "iA"
-                                types.append(b + a)
-                        else:
-                                types.append(a + b)
-        
-        return types[randint(0,len(types)-1)]
+                        types.append(b + a)
+        r = types[randint(0,len(types)-1)]
+        if((r[0]=="i" and (r[1] == "A" or r[1] =="B"))or(r[0]=="B" and r[1]=="A")):
+           return r[1] + r[0]
+        return r
 
 #Randomthings
 def randomBType():
@@ -98,6 +114,14 @@ def randomGenre():
         return(randint(0,1))
 def randomPerson(gen,genre):
         return Person(randomBType(),randomRHType(),genre,gen)
+def parseResult(results):
+        r = {}
+        r["A"] = results["Ai"] + results["AA"]
+        r["B"] = results["Bi"] + results["BB"]
+        r["AB"] = results["AB"]
+        r["O"] = results["ii"]
+        return(r)
+        
 
 start_time = time()
 initialPop = 300
@@ -148,14 +172,10 @@ for i in population:
                 results[i.bloodType] =1
         if(i.isAlive): alive +=1
 
-parsedR = {}
-parsedR["A"] = results["Ai"] + results["AA"]
-parsedR["B"] = results["Bi"] + results["BB"]
-parsedR["AB"] = results["AB"]
-parsedR["O"] = results["ii"]
+
 
 print(" Alive pop:{0}\n Total Pop:{1}\n Years:{2} ".format(alive,len(population),years))      
-print(parsedR)
+print(parseResults(results))
 print("Runtime: %ss " % (time() - start_time))
 
 
